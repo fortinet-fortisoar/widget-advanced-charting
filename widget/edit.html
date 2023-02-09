@@ -1,0 +1,245 @@
+<form data-ng-submit="save()" class="noMargin" name="editWidgetForm" data-ng-class="{'state-wait': processing }"
+    novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title col-md-9">Edit Chart</h3>
+        <button type="button" class="close" data-ng-click="cancel()" data-dismiss="modal" aria-label="Close"
+            id="close-edit-widget-form-btn">
+            <div aria-hidden="true" class="version-button">+</div>
+        </button>
+        <div class="pb-toggle-btn pull-left col-md-9">
+          <label class="control-label font-10px display-inline-block"><span class="display-inline-block margin-right-2">Configuration Mode</span> <span data-uib-tooltip="Selecting 'Wizard' will allow you to configure your chart's data collection parameters from this window. Data collection will be handled by a playbook. Select 'Custom' if you already have or wish to create a playbook to collect to appropriate data and store it in a record in a C3-renderable JSON format" data-tooltip-append-to-body="true" data-tooltip-placement="bottom"><i class="icon icon-information" aria-hidden="true"></i></span></label>
+          <button type="button" class="btn btn-xs muted-playbook margin-left-sm" data-ng-class="!config.customMode ? 'active' : 'inactive'" data-ng-click="config.customMode=false" id="toggle-wizard-btn">Wizard</button>
+          <button type="button" class="btn btn-xs muted-playbook" data-ng-class="config.customMode ? 'active' : 'inactive'" data-ng-click="config.customMode=true" id="toggle-custom-btn">Custom</button>
+        </div>
+    </div>
+    <div class="modal-body" data-ng-show="!config.customMode">
+        <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm.title.$invalid && editWidgetForm.title.$touched }">
+          <label for="title" class="control-label">Title<span class="text-danger">*</span></label>
+          <input id="title" name="title" type="text" class="form-control" data-ng-model="config.title" required>
+          <div data-cs-messages="editWidgetForm.title">
+          </div>
+        </div>
+        <!--
+          Commenting to test removal of chart type selection
+      	<div class="form-group">
+          <label for="chartType" class="control-label">Chart Type</label>
+          <div class="display-flex">
+            <div class="chartType" data-ng-class="{'selected': chartType==config.selectedChartType}" ng-repeat="chartType in chartTypes" data-ng-click="selectChartType(chartType)">
+              <span>{{chartType.title}}</span>
+            </div>
+          </div>
+      	</div>
+        -->
+        <div>
+          <uib-accordion close-others="true" data-ng-if="config.dataSets" data-ng-hide="processing">
+            <div uib-accordion-group data-ng-repeat="dataSet in config.dataSets" is-open="status1.open" class="queue-card-wrapper panel-default">
+                <!--<div ng-controller="dataSetCtrl as dsc">-->
+              <uib-accordion-heading>
+                <div class="queue-card-header padding-left-md workspace-connector-metadata-container" data-ng-class="{'workspace-connector-metadata-bg-color': status1.open}">
+                  <div class="pull-left queue-card-header-text" data-ng-if="!dataSet.group" data-ng-class="{'queue-text-active-color': status1.open}">{{dataSet.title ? dataSet.title : "Data Set "+$index}}</div>
+                  <div class="pull-left queue-card-header-text" data-ng-if="dataSet.group" data-ng-class="{'queue-text-active-color': status1.open}">{{"Data Set Group "+$index}}</div>
+                  <div class="pull-right">
+                    <!--<button id="simple-condition-remove-{{ $index }}-{{formName}}" type="button" class="btn-sm btn btn-link" data-ng-click="removeConditionSet($index)" data-ng-hide="disabled || query.filters.length <= minimumFilters">
+                      <span class="icon icon-close text-danger"></span>
+                    </button>-->
+                    <button type="button" class="btn-sm btn btn-link" data-ng-click="removeDataSet(config.dataSets, $index)">
+                      <span class="icon icon-close text-danger"></span>
+                    </button>
+                    <span class="queue-card-actions">&nbsp;<i class="fa {{status1.open===true? 'fa-chevron-up':'fa-chevron-down'}}"></i></span>
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+              </uib-accordion-heading>
+              <div ng-controller="dataSetCtrl as dsc" ng-if="!dataSet.group">
+                <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm.dataSettitle{{$index}}.$invalid && editWidgetForm.dataSettitle{{$index}}.$touched }">
+                    <label for="dataSetTitle{{$index}}" class="control-label">Data Set Title<span class="text-danger">*</span></label>
+                    <input type="text" id="dataSetTitle{{$index}}" class="form-control" data-ng-model="dataSet.title" ng-required="!config.customMode">
+                </div>
+                <div class="form-group" data-ng-class="{ 'has-error': dataSet.resource{{$index}}.$invalid && dataSet.resource{{$index}}.$touched }" data-ng-if="modules">
+                    <label for="resource{{$index}}" class="control-label">Data Source<span class="text-danger">*</span></label>
+                    <select name="resource" id="resource{{$index}}" class="form-control" data-ng-options="module.type as module.name for module in modules" data-ng-model="dataSet.resource" ng-required="!config.customMode">
+                    <option value="">Select an Option</option>
+                    </select>
+                    <div data-cs-messages="dataSet.resource"></div>
+
+                    <label for="plotType{{$index}}" class="control-label">Plot Type<span class="text-danger">*</span></label>
+                    <select name="plotType" id="plotType{{$index}}" class="form-control" data-ng-options="type for type in plotTypes" data-ng-model="dataSet.plotType" ng-required="!config.customMode">
+                    </select>
+                    <div data-cs-messages="dataSet.plotType"></div>
+                </div>
+
+                <div data-ng-show="dataSet.resource">
+                    <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm['mapping{{$index}}'].$invalid && editWidgetForm['mapping{{$index}}'].$touched }">
+                      <label for="mapping{{$index}}" class="control-label">Field to Build Time Axis With:<span class="text-danger">*</span></label>
+                      <select name="mapping{{$index}}" id="mapping{{$index}}" class="form-control" ng-required="!config.customMode" data-ng-model="dataSet.mappingField" data-ng-options="field.name as field.title for field in moduleFieldsArrays[dataSet.resource] | filter:{'type': 'datetime'} | orderBy: 'title'">
+                        <option value="">Select an option</option>
+                      </select>
+                      <div data-cs-messages="editWidgetForm['mapping{{$index}}']"></div>
+                    </div>
+
+                    <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm['grouping{{$index}}'].$invalid && editWidgetForm['grouping{{$index}}'].$touched }">
+                      <label for="grouping{{$index}}" class="control-label">Group Results by:</label>
+                      <select name="grouping{{$index}}" id="grouping{{$index}}" class="form-control" data-ng-model="dataSet.groupingField" data-ng-options="field.name as field.title for field in moduleFieldsArrays[dataSet.resource] | filter:{'type': 'picklist'} | orderBy: 'title'">
+                        <option value="">Select an option</option>
+                      </select>
+                      <div data-cs-messages="editWidgetForm['grouping{{$index}}']"></div>
+                    </div>
+                </div>
+
+                <div class="form-group" data-ng-if="dataSet.resource" data-ng-class="{ 'has-error': dataSet.filters.$invalid && dataSet.filters.$touched }">
+                    <label for="filters{{$index}}" class="control-label">Filter Criteria</label>
+                    <div data-cs-conditional data-ng-if="moduleFieldsArrays[dataSet.resource].length > 0" data-fields="moduleFields[dataSet.resource]" data-mode="'queryFilters'" data-ng-model="dataSet.query"
+                    data-parent-form="editWidgetForm" data-enable-expression="(page==='dashboard' || page==='reporting')" data-reset-field="dataSet.resource" data-show-uuid="true" data-form-name="'editWidgetForm'"></div>
+                    <div data-cs-messages="dataSet.filters"></div>
+                </div>
+              </div>
+              <uib-accordion close-others="true" data-ng-if="dataSet.group">
+                <!-- put in uib-accordion-group on ng-repeat here -->
+                <!--<div uib-accordion-group data-ng-repeat="subDataSet in dataSet.dataSets" is-open="status2.open" class="queue-card-wrapper panel-default" data-ng-class="{'connector-editor-metadata-container': status2.open}">-->
+                <div uib-accordion-group data-ng-repeat="subDataSet in dataSet.dataSets" is-open="status2.open" class="queue-card-wrapper panel-default">
+                    <uib-accordion-heading>
+                        <div class="queue-card-header padding-left-md workspace-connector-metadata-container" data-ng-class="{'workspace-connector-metadata-bg-color': status2.open}">
+                            <div class="pull-left queue-card-header-text" data-ng-class="{'queue-text-active-color': status2.open}">{{subDataSet.title ? subDataSet.title : "Data Set "+$index}}</div>
+                            <div class="pull-right">
+                              <button type="button" class="btn-sm btn btn-link" data-ng-click="removeDataSet(dataSet.dataSets, $index)">
+                                <span class="icon icon-close text-danger"></span>
+                              </button>
+                              <span class="queue-card-actions">&nbsp;<i class="fa {{status2.open===true? 'fa-chevron-up':'fa-chevron-down'}}"></i></span>
+                            </div>
+                            <div class="clearfix"></div>
+                          </div>
+                    </uib-accordion-heading>
+                    
+
+                    <div ng-controller="dataSetCtrl as dsc">
+                        <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm.subDataSetTitle{{$index}}.$invalid && editWidgetForm.subDataSetTitle{{$index}}.$touched }">
+                            <label for="subDataSetTitle{{$index}}}" class="control-label">Data Set Title<span class="text-danger">*</span></label>
+                            <input type="text" name="subDataSetTitle{{$index}}" id="subDataSetTitle{{$index}}" class="form-control" data-ng-model="subDataSet.title" ng-required="!config.customMode">
+                        </div>
+                        <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm.subDataSetResource{{$index}}.$invalid && subDataSet.resource.$touched }" data-ng-if="modules">
+                            <label for="subDataSetResource{{$index}}" class="control-label">Data Source<span class="text-danger">*</span></label>
+                            <select name="subDataSetResource" name="subDataSetResource{{$index}}" id="subDataSetResource{{$index}}" class="form-control" data-ng-options="module.type as module.name for module in modules" data-ng-model="subDataSet.resource" ng-required="!config.customMode">
+                            <option value="">Select an Option</option>
+                            </select>
+                            <div data-cs-messages="subDataSet.resource"></div>
+                        </div>
+                        <div data-ng-show="subDataSet.resource">
+                            <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm['mapping{{$index}}'].$invalid && editWidgetForm['mappint{{$index}}'].$touched }">
+                              <label for="mapping{{$index}}" class="control-label">Field to Build Time Axis With<span class="text-danger">*</span></label>
+                              <select name="mapping{{$index}}" id="mapping{{$index}}" class="form-control" ng-required="!config.customMode" data-ng-model="subDataSet.mappingField" data-ng-options="field.name as field.title for field in moduleFieldsArrays[subDataSet.resource] | filter:{'type': 'datetime'} | orderBy: 'title'">
+                                <option value="">Select an option</option>
+                              </select>
+                              <div data-cs-messages="editWidgetForm['mapping{{$index}}']"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" data-ng-if="subDataSet.resource" data-ng-class="{ 'has-error': subDataSet.filters.$invalid && subDataSet.filters.$touched }">
+                            <label for="subDataSetfilters{{$index}}" class="control-label">Filter Criteria</label>
+                            <div data-cs-conditional data-ng-if="moduleFieldsArrays[subDataSet.resource].length > 0" data-fields="moduleFields[subDataSet.resource]" data-mode="'queryFilters'" data-ng-model="subDataSet.query"
+                            data-parent-form="editWidgetForm" data-enable-expression="(page==='dashboard' || page==='reporting')" data-reset-field="subDataSet.resource" data-show-uuid="true" data-form-name="'editWidgetForm'"></div>
+                            <div data-cs-messages="subDataSet.filters"></div>
+                        </div>
+                    </div>
+
+
+                    
+                </div>
+              </uib-accordion>
+              <div class="col-md-11 padding-left-sm" data-ng-if="dataSet.group">
+                <a class="pull-left font-10px margin-right-lg btn-link btn" name="addFilterButton" data-ng-click="addSubDataSet(dataSet)"><i class="icon icon-add"></i>&nbsp;ADD GROUPED DATASET</a>
+              </div>
+            </div>
+          </uib-accordion>  
+        </div>
+        <div class="row margin-left-0 margin-top-lg margin-bottom-lg" data-ng-hide="processing || disabled">
+          <div class="col-md-11 padding-left-sm">
+                <a class="pull-left font-10px margin-right-lg btn-link btn" name="addFilterButton" data-ng-click="addDataSet(false)"><i class="icon icon-add"></i>&nbsp;ADD INDIVIDUAL DATASET</a>
+                <a class="pull-left font-10px margin-left-lg btn-link btn" name="addGroupFilter" data-ng-click="addDataSet(true)"><i class="icon icon-add"></i>&nbsp;ADD STACKED DATASETS</a>
+            </div>
+        </div>
+        <div data-ng-hide="processing">
+            <!-- Time Period -->
+            <div class="form-group" data-ng-class="{ 'has-error': editWidgetForm['timePeriod'].$invalid && editWidgetForm['timePeriod'].$touched }">
+              <label for="timePeriod" class="control-label">Time Axis View (X)<span class="text-danger">*</span></label>
+              <select name="timePeriod" id="timePeriod" class="form-control" ng-required="!config.customMode" data-ng-model="config.timePeriod" data-ng-options="period for period in timePeriods">
+                <option value="">Select an option</option>
+              </select>
+              <div data-cs-messages="editWidgetForm['timePeriod']"></div>
+            </div>
+            <!-- Time Range (New) -->
+            <div class="padding-0 no-warp-date-advance">
+              <div data-cs-field="dateField" id='relativeDate' name="relativeDate" data-ng-model="config.relativeDate" ng-required="!config.customMode" data-form-name="editWidgetForm"></div>
+              <div data-cs-messages="editWidgetForm.relativeDate"></div>
+            </div>
+        </div>
+        <div class="charts-background fade-in-animation">
+            <div class="padding-top-sm padding-right-md padding-bottom-sm padding-left-md " data-ng-if="processing">
+                <cs-spinner data-show-background="true"></cs-spinner>
+                <div class="watermark"><span>Saving Chart Configuration</span></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-body" data-ng-show="config.customMode">
+      <!-- Chart Title -->
+      <div class="form-group" data-ng-class="{ 'has-error': config.customMode && editWidgetForm.title.$invalid && editWidgetForm.title.$touched }">
+        <label for="title" class="control-label">Title<span class="text-danger">*</span></label>
+        <input id="title" name="title" type="text" class="form-control" data-ng-model="config.title" data-ng-required="config.customMode">
+        <div data-cs-messages="editWidgetForm.title">
+        </div>
+      </div>
+
+      <!-- Data Source -->
+      <div class="form-group" data-ng-class="{ 'has-error': config.customMode && editWidgetForm.customResource.$invalid && editWidgetForm.customResource.$touched }" data-ng-if="modules">
+        <label for="customResource" class="control-label">Data Source<span class="text-danger">*</span></label>
+        <select name="customResource" id="customResource" class="form-control" data-ng-options="module.type as module.name for module in modules" data-ng-model="config.customResource" data-ng-required="config.customMode">
+        <option value="">Select an Option</option>
+        </select>
+        <div data-cs-messages="editWidgetForm.customResource"></div>
+      </div>
+
+      <!-- Field for JSON data -->
+      <div class="form-group" data-ng-class="{ 'has-error': config.customMode && editWidgetForm.customDataField.$invalid && editWidgetForm.customDataField.$touched }">
+        <label for="customDataField" class="control-label">Field Containing Chart Data<span class="text-danger">*</span></label>
+        <select name="customDataField" id="customDataField" class="form-control" data-ng-required="config.customMode" data-ng-model="config.customDataField" data-ng-options="field.name as field.title for field in moduleFieldsArrays[config.customResource] | filter:{'type': 'object'} | orderBy: 'title'">
+          <option value="">Select an option</option>
+        </select>
+        <div data-cs-messages="editWidgetForm.customDataField"></div>
+      </div>
+
+      <!-- Query section to replace record id selection below -->
+      <div class="form-group" data-ng-hide="!config.customResource && moduleFieldsArrays[config.customResource].length > 0" data-ng-class="{ 'has-error': editWidgetForm.customFilter.$invalid && editWidgetForm.customFilters.$touched }">
+        <!-- Filters -->
+        <label for="customFilters" class="control-label">Record Selection Filter</label>
+        <div data-cs-conditional data-ng-if="moduleFieldsArrays[config.customResource].length > 0" data-fields="moduleFields[config.customResource]" data-mode="'queryFilters'" data-ng-model="config.customFilters"
+        data-parent-form="editWidgetForm" data-enable-expression="(page==='dashboard' || page==='reporting')" data-reset-field="config.customResource" data-show-uuid="true" data-form-name="'editWidgetForm'"></div>
+        <div data-cs-messages="editWidgetForm.customFilters"></div>
+
+        <!-- Sorting -->
+        <label for="customRecordSort" class="control-label">Take First Record When Sorted on Field:</label>
+        <div class="row">
+          <div class="pull-left col-lg-6 col-md-4 col-sm-5">
+            <div class="form-group margin-bottom-0" data-ng-class="{'has-error': editWidgetForm.customSort.$touched && !editWidgetForm.customSort.$valid }">
+              <select name="customSort" class="form-control" ng-model="customSort.field" data-ng-required="config.customMode" data-ng-options="field.name as field.title for field in moduleFieldsArrays[config.customResource] | orderBy: 'title'" data-cs-focus>
+                <option value="" disabled selected>Select</option>
+              </select>
+              <div data-cs-messages="editWidgetForm.customSort"></div>
+            </div>
+          </div>
+          <div class="pull-right col-lg-6 col-md-8 col-sm-7 padding-right-0">
+            <div class="radio margin-top-12">
+              <label class="checkbox-inline" data-ng-repeat="order in SORT_ORDER">
+                <input type="radio" data-ng-model="customSort.direction" data-ng-value="order.value"/>&nbsp;{{order.label}}&nbsp;&nbsp;&nbsp;&nbsp;
+              </label>
+              <span class="icon icon-close text-danger" data-ng-click="removeDefaultSort(defaultSortObj)" role="button" tabindex="0"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button id="edit-widget-save" type="submit" class="btn btn-sm btn-primary"><i
+                class="icon icon-check margin-right-sm"></i>Save</button>
+        <button id="edit-widget-cancel" type="button" class="btn btn-sm btn-default" data-ng-click="cancel()"><i
+                class="icon icon-close margin-right-sm"></i>Close</button>
+    </div>
+</form>

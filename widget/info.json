@@ -1,0 +1,19 @@
+{
+	"name": "advancedCharting",
+	"title": "Advanced Charting",
+	"subTitle": "Create flexible representations of your FortiSOAR data",
+	"version": "1.0.0",
+	"metadata": {
+		"description": "Create multiple bar, stacked bar, or charts with a combination of different data representations",
+		"pages": [
+			"Reports",
+			"Dashboard",
+			"Listing"
+		],
+		"certified": "No",
+		"publisher": "Fortinet",
+		"compatibility": [
+			"7.3.0"
+		]
+	}
+}
