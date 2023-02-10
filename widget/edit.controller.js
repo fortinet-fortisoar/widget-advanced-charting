@@ -66,7 +66,6 @@
           if (!$scope.moduleFields[newValue]) {
             populateFieldLists(newValue);
           }
-          // TODO: Clear the sort, make sure that the sort fields update correctly
           $scope.customSort = {};
         })
       
@@ -104,7 +103,6 @@
           else {
             newDataSet.query = [];
             newDataSet.groupingField = null;
-            //newDataSet.plotType = $scope.plotTypes[0];
             newDataSet.plotType = "Bar";
           }
           $scope.config.dataSets.push(newDataSet)
@@ -188,7 +186,6 @@
         function adjustDataSetQuery(dataSet) {
             if(dataSet.group) {
                 dataSet.dataSets.forEach(subDataSet => adjustDataSetQuery(subDataSet));
-                //angular.forEach(dataSet.dataSets, adjustDataSetQuery(subDataSet));
             } else {
                 dataSet.query.aggregates = [{
                   operator: 'countdistinct',
@@ -205,7 +202,6 @@
                     dataSet.groupingFieldOptions = $scope.moduleFields[dataSet.resource][dataSet.groupingField].options.map(option => option.itemValue);
                   }
                 }
-                //dataSet.query.aggregates.push({'operator': 'groupby', 'alias': dataSet.mappingField, 'field': dataSet.mappingField});
                 dataSet.query.sort = [];
             }
         }
@@ -249,25 +245,6 @@
               $scope.moduleFieldsArrays[dataSet.resource] = dsc.entity.getFormFieldsArray()
             })
           }
-            /*
-            dsc.entity = new Entity(dataSet.resource);
-            //dataSet.meta = {"userField": [], "relatedModules": []};
-
-            dsc.entity.loadFields().then(function() {
-              for (var key in dsc.entity.fields) {
-                if (dsc.entity.fields[key].type === 'datetime') {
-                  dsc.entity.fields[key].type = 'datetime.quick';
-                } else if (dsc.entity.fields[key].model === 'people' && dsc.entity.fields[key].type !== 'manyToMany') {
-                  dataSet.meta.userField.push(dsc.entity.fields[key]);
-                }
-                if (dsc.entity.fields[key].type === 'manyToMany'){
-                  dataSet.meta.relatedModules.push(dsc.entity.fields[key]);
-                }
-              }
-              dataSet.meta.fields = Object.values(dsc.entity.getFormFields()).map((field => {return {type: field.type, name: field.name, title:field.title}}));
-              dataSet.meta.fieldsArray = dsc.entity.getFormFieldsArray();
-            });
-            */
           }
     }
 })();

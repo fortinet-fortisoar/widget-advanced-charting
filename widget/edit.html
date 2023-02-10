@@ -19,29 +19,14 @@
           <div data-cs-messages="editWidgetForm.title">
           </div>
         </div>
-        <!--
-          Commenting to test removal of chart type selection
-      	<div class="form-group">
-          <label for="chartType" class="control-label">Chart Type</label>
-          <div class="display-flex">
-            <div class="chartType" data-ng-class="{'selected': chartType==config.selectedChartType}" ng-repeat="chartType in chartTypes" data-ng-click="selectChartType(chartType)">
-              <span>{{chartType.title}}</span>
-            </div>
-          </div>
-      	</div>
-        -->
         <div>
           <uib-accordion close-others="true" data-ng-if="config.dataSets" data-ng-hide="processing">
             <div uib-accordion-group data-ng-repeat="dataSet in config.dataSets" is-open="status1.open" class="queue-card-wrapper panel-default">
-                <!--<div ng-controller="dataSetCtrl as dsc">-->
               <uib-accordion-heading>
                 <div class="queue-card-header padding-left-md workspace-connector-metadata-container" data-ng-class="{'workspace-connector-metadata-bg-color': status1.open}">
                   <div class="pull-left queue-card-header-text" data-ng-if="!dataSet.group" data-ng-class="{'queue-text-active-color': status1.open}">{{dataSet.title ? dataSet.title : "Data Set "+$index}}</div>
                   <div class="pull-left queue-card-header-text" data-ng-if="dataSet.group" data-ng-class="{'queue-text-active-color': status1.open}">{{"Data Set Group "+$index}}</div>
                   <div class="pull-right">
-                    <!--<button id="simple-condition-remove-{{ $index }}-{{formName}}" type="button" class="btn-sm btn btn-link" data-ng-click="removeConditionSet($index)" data-ng-hide="disabled || query.filters.length <= minimumFilters">
-                      <span class="icon icon-close text-danger"></span>
-                    </button>-->
                     <button type="button" class="btn-sm btn btn-link" data-ng-click="removeDataSet(config.dataSets, $index)">
                       <span class="icon icon-close text-danger"></span>
                     </button>
@@ -94,8 +79,6 @@
                 </div>
               </div>
               <uib-accordion close-others="true" data-ng-if="dataSet.group">
-                <!-- put in uib-accordion-group on ng-repeat here -->
-                <!--<div uib-accordion-group data-ng-repeat="subDataSet in dataSet.dataSets" is-open="status2.open" class="queue-card-wrapper panel-default" data-ng-class="{'connector-editor-metadata-container': status2.open}">-->
                 <div uib-accordion-group data-ng-repeat="subDataSet in dataSet.dataSets" is-open="status2.open" class="queue-card-wrapper panel-default">
                     <uib-accordion-heading>
                         <div class="queue-card-header padding-left-md workspace-connector-metadata-container" data-ng-class="{'workspace-connector-metadata-bg-color': status2.open}">

@@ -20,7 +20,6 @@
 
             if ($scope.config.customMode) {
                 $resource(API.QUERY + $scope.config.customResource + '?$limit=1').save($scope.config.customFilters).$promise.then(function(data) {
-                //queryForChartRecord($scope.config.customResource, $scope.config.customRecordId).then(function(data) {
                     if (data['hydra:member'].length == 0) {
                         $scope.errMsg = "A record in the specified module with the provided ID does not exist.";
                         $scope.noData=true;
@@ -59,27 +58,6 @@
                         0,
                         false)
                     }
-                    /*if(data['hydra:member'].length > 0) {
-                        if (!data['hydra:member'][0].queryResults) {
-                            $scope.noData=true;
-                            $scope.processing=false;
-                        }
-                        else {
-                            angular.forEach(data['hydra:member'][0].queryResults, function(value, key) {
-                                dataFormat[key] = value;
-                            })
-        
-                            $timeout(function() {
-                                c3.generate(dataFormat);
-                                $scope.noData=false;
-                                $scope.processing=false;
-                                },
-                            0,
-                            false)
-                        }
-                    }*/
-    
-    
                 })
             }
         }
